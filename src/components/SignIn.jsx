@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
+import { useHistory } from "react-router-native";
 import { Formik } from 'formik';
 import * as yup from 'yup';
 
 
 import FormikTextInput from './FormikTextInput';
 import Text from './Text';
+import useSignIn from '../hooks/useSignIn';
 
 import theme from '../theme';
 
@@ -45,11 +47,6 @@ const validationSchema = yup.object().shape({
 		.required('Password is required'),
 });
 
-const initialValues = {
-	username: '',
-	password: '',
-};
-
 const SignInForm = ({ onSubmit }) => {
 	return (
 		<View style={styles.container}>
@@ -69,11 +66,23 @@ const SignInForm = ({ onSubmit }) => {
 
 
 const SignIn = () => {
-	const onSubmit = values => {
-		const username = values.username;
-		const password = values.password;
+	const [signIn] = useSignIn();
+	const history = useHistory();
 
-		console.log(`username: ${username} and password: ${password}`);
+	const onSubmit = async (values) => {
+		const { username, password } = values;
+  
+		try {
+			await signIn({ username, password });
+			history.push("/");
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
+	const initialValues = {
+		username: '',
+		password: '',
 	};
 
 	return (
